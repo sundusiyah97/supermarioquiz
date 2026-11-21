@@ -662,28 +662,28 @@
 
             <!-- PANEL KUIS INDEPENDEN PEMAIN 1 (Juga dipakai untuk Single Player) -->
             <div id="quiz-overlay-p1" class="hidden fixed inset-0 flex items-center justify-center p-3 pointer-events-auto z-30">
-                <div class="panel-retro w-full max-w-md p-4 sm:p-5 bg-[#fff8e7]">
+                <div class="panel-retro w-full max-w-lg max-h-[85vh] overflow-y-auto p-3 sm:p-4 bg-[#fff8e7]" style="border-width:4px;box-shadow:0 6px 0 rgba(0,0,0,0.6)">
                     <div class="flex items-center justify-between border-b-3 border-black pb-2 mb-2">
                         <span class="font-pixel text-[9px] sm:text-[10px] text-red-600">MARIO ADVENTURE QUIZ</span>
                         <span id="q1-cp-badge" class="bg-blue-600 text-white font-pixel text-[9px] px-2 py-1 rounded">CHECKPOINT 1/10</span>
                     </div>
                     <div id="q1-meta" class="text-[11px] font-bold text-slate-500 mb-1">Matematika • Kelas 2 • Mudah</div>
-                    <div id="q1-question" class="font-bold text-sm sm:text-base text-slate-900 mb-3 leading-snug">Pertanyaan?</div>
-                    <div id="q1-options" class="grid grid-cols-1 gap-2"></div>
+                    <div id="q1-question" class="font-bold text-sm sm:text-base text-slate-900 mb-2 leading-snug">Pertanyaan?</div>
+                    <div id="q1-options" class="grid grid-cols-2 gap-2"></div>
                     <div id="q1-feedback" class="hidden mt-3 p-2.5 rounded-xl border-2 font-bold text-center text-xs sm:text-sm"></div>
                 </div>
             </div>
 
             <!-- PANEL KUIS INDEPENDEN PEMAIN 2 (Khusus Multiplayer Sisi Kanan) -->
             <div id="quiz-overlay-p2" class="hidden fixed top-20 bottom-2 right-0 w-1/2 flex items-center justify-center p-2 pointer-events-auto z-30">
-                <div class="panel-retro w-full max-w-md p-3 sm:p-4 bg-[#f0fdf4]">
+                <div class="panel-retro w-full max-w-md max-h-full overflow-y-auto p-2.5 sm:p-3 bg-[#f0fdf4]" style="border-width:4px;box-shadow:0 6px 0 rgba(0,0,0,0.6)">
                     <div class="flex items-center justify-between border-b-3 border-black pb-2 mb-2">
                         <span class="font-pixel text-[8px] sm:text-[10px] text-emerald-700">PEMAIN 2 QUIZ</span>
                         <span id="q2-cp-badge" class="bg-emerald-600 text-white font-pixel text-[8px] px-2 py-1 rounded">CHECKPOINT 1/10</span>
                     </div>
                     <div id="q2-meta" class="text-[10px] font-bold text-slate-500 mb-1">Mapel • Kelas</div>
                     <div id="q2-question" class="font-bold text-xs sm:text-sm text-slate-900 mb-2.5 leading-snug">Pertanyaan?</div>
-                    <div id="q2-options" class="grid grid-cols-1 gap-1.5"></div>
+                    <div id="q2-options" class="grid grid-cols-2 gap-1.5"></div>
                     <div id="q2-feedback" class="hidden mt-2 p-2 rounded-xl border-2 font-bold text-center text-xs"></div>
                 </div>
             </div>
@@ -2419,7 +2419,8 @@ function renderCheckpointQuestion(playerIdx) {
     q.options.forEach((optText, idx) => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'btn-retro bg-white hover:bg-yellow-100 text-left px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2';
+        btn.className = 'btn-retro bg-white hover:bg-yellow-100 text-left px-2 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2 leading-tight';
+        btn.style.borderWidth = '3px'; btn.style.boxShadow = '0 4px 0 #000';
         btn.innerHTML = `<span class="bg-blue-600 text-white font-pixel text-[10px] px-2 py-1 rounded">${letters[idx]}</span><span>${optText}</span>`;
         btn.onclick = () => submitCheckpointAnswer(playerIdx, idx);
         optsBox.appendChild(btn);
@@ -2980,5 +2981,17 @@ window.addEventListener('load', () => {
     requestAnimationFrame(gameLoop);
 });
 </script>
+    <button id="btn-fullscreen" onclick="toggleFullscreen()" title="Layar Penuh" class="btn-retro fixed bottom-3 left-1/2 -translate-x-1/2 z-[60] bg-yellow-400 text-black font-pixel text-[10px] px-2.5 py-2 rounded-lg" style="border-width:3px;box-shadow:0 4px 0 #000">⛶</button>
+    <script>
+    function toggleFullscreen(){
+      const d=document, el=d.documentElement;
+      if(!d.fullscreenElement && !d.webkitFullscreenElement){
+        (el.requestFullscreen||el.webkitRequestFullscreen).call(el)?.catch?.(()=>{});
+        try{ screen.orientation?.lock?.('landscape').catch(()=>{}); }catch(e){}
+      } else { (d.exitFullscreen||d.webkitExitFullscreen).call(d); }
+    }
+    function syncFsBtn(){ const on=!!(document.fullscreenElement||document.webkitFullscreenElement); const b=document.getElementById('btn-fullscreen'); b.textContent=on?'✕':'⛶'; b.title=on?'Keluar Layar Penuh':'Layar Penuh'; }
+    document.addEventListener('fullscreenchange',syncFsBtn); document.addEventListener('webkitfullscreenchange',syncFsBtn);
+    </script>
 </body>
 </html>
