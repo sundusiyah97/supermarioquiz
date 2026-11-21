@@ -1,0 +1,12 @@
+{
+  "source": "code-archive (game-main.zip)",
+  "capabilities": [
+    {"capability": "code", "source": "single-file index.html game (Tailwind CDN, Google Fonts, vanilla JS canvas)", "outcome": "served unchanged as a static page inside the app", "status": "verified", "next_action": "none"},
+    {"capability": "assets", "source": "mario.mp3 background music", "outcome": "hosted as Lovable asset; HTML points to its URL", "status": "verified", "next_action": "none"},
+    {"capability": "records", "source": "question bank in browser localStorage (36 built-in questions)", "outcome": "preserved as-is (per-device storage, no server database in source)", "status": "verified", "next_action": "none"},
+    {"capability": "auth", "source": "none", "outcome": "not applicable", "status": "verified", "next_action": "none"},
+    {"capability": "ai", "source": "Google Gemini called from browser with a key each player enters", "outcome": "preserved unchanged; no project secret required", "status": "pending", "next_action": "live check needs a player's own Gemini key"},
+    {"capability": "secrets", "source": "none", "outcome": "not applicable", "status": "verified", "next_action": "none"},
+    {"capability": "public_endpoints_webhooks_schedules", "source": "none", "outcome": "not applicable", "status": "verified", "next_action": "none"}
+  ]
+}

@@ -1,23 +1,32 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// The home route ships no og:image, so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Mario Adventure Quiz - Game Edukasi Platformer 2D" },
+      {
+        name: "description",
+        content: "Game edukasi platformer 2D bergaya Mario dengan kuis Kurikulum Merdeka untuk SD kelas 1-6.",
+      },
+      { property: "og:title", content: "Mario Adventure Quiz - Game Edukasi Platformer 2D" },
+      {
+        property: "og:description",
+        content: "Lompat, kumpulkan koin, dan jawab soal kuis SD kelas 1-6 dalam petualangan retro.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <iframe
+      src="/game/index.html"
+      title="Mario Adventure Quiz"
+      allow="autoplay; fullscreen"
+      className="fixed inset-0 h-full w-full border-0"
+    />
   );
 }
