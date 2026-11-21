@@ -119,7 +119,9 @@
             display: block;
             image-rendering: pixelated;
         }
-    </style>
+    .btn-luigi{background:rgba(22,163,74,0.6)!important}
+.mp-quiz .q-opt{font-size:11px;padding:4px 6px}
+</style>
 </head>
 <body class="text-slate-900">
 
@@ -648,7 +650,7 @@
                     </div>
                 </div>
                 <!-- HUD Pemain 2 -->
-                <div class="px-2 py-1.5 flex flex-col gap-1 pr-12">
+                <div class="px-2 py-1.5 flex flex-col gap-1 pr-10">
                     <div class="flex justify-between items-center font-pixel text-[8px] sm:text-[10px]">
                         <span id="mp-p2-label" class="text-emerald-400 truncate max-w-[90px]">P2: LUIGI</span>
                         <span id="mp-p2-lives">❤️❤️❤️</span>
@@ -664,7 +666,12 @@
                     </div>
                 </div>
                 <!-- Tombol Pause Tengah Atas -->
-                <button onclick="togglePause()" class="pointer-events-auto absolute right-2 top-1/2 -translate-y-1/2 btn-retro bg-yellow-400 text-black font-pixel text-[9px] px-2.5 py-2 rounded-lg">❚❚</button>
+                <div class="pointer-events-auto absolute left-1/2 top-full -translate-x-1/2 -mt-0.5 flex items-center gap-1 bg-black/85 border-2 border-t-0 border-yellow-400 rounded-b-lg px-1.5 py-1">
+                    <span class="font-pixel text-[9px] text-yellow-300 px-1">VS</span>
+                    <button onclick="toggleSound()" class="mp-sound-btn bg-black/70 border border-white/50 px-1.5 py-0.5 rounded text-[10px]">🔊</button>
+                    <button onclick="quickToggleTouch()" class="bg-black/70 border border-white/50 px-1.5 py-0.5 rounded text-[10px]" title="Tombol Sentuh">🎮</button>
+                    <button onclick="togglePause()" class="btn-retro bg-yellow-400 text-black font-pixel text-[8px] px-2 py-1 rounded">❚❚</button>
+                </div>
             </div>
 
             <!-- PANEL KUIS INDEPENDEN PEMAIN 1 (Juga dipakai untuk Single Player) -->
@@ -682,10 +689,10 @@
             </div>
 
             <!-- PANEL KUIS INDEPENDEN PEMAIN 2 (Khusus Multiplayer Sisi Kanan) -->
-            <div id="quiz-overlay-p2" class="hidden fixed top-20 bottom-2 right-0 w-1/2 flex items-center justify-center p-2 pointer-events-auto z-30">
+            <div id="quiz-overlay-p2" class="hidden fixed top-16 bottom-1 right-0 w-1/2 flex items-center justify-center p-1.5 pointer-events-auto z-30">
                 <div class="panel-retro w-full max-w-md max-h-full overflow-y-auto p-2.5 sm:p-3 bg-[#f0fdf4]" style="border-width:4px;box-shadow:0 6px 0 rgba(0,0,0,0.6)">
                     <div class="flex items-center justify-between border-b-3 border-black pb-2 mb-2">
-                        <span class="font-pixel text-[8px] sm:text-[10px] text-emerald-700">PEMAIN 2 QUIZ</span>
+                        <span class="font-pixel text-[8px] sm:text-[10px] text-emerald-700"><span id="q2-title">PEMAIN 2</span> • KUIS</span>
                         <span id="q2-cp-badge" class="bg-emerald-600 text-white font-pixel text-[8px] px-2 py-1 rounded">CHECKPOINT 1/10</span>
                     </div>
                     <div id="q2-meta" class="text-[10px] font-bold text-slate-500 mb-1">Mapel • Kelas</div>
@@ -712,43 +719,25 @@
             </div>
 
             <!-- KONTROL VIRTUAL MULTI-TOUCH (MULTIPLAYER SPLIT SCREEN) -->
-            <div id="touch-multi" class="hidden w-full grid grid-cols-2 px-2 pb-3 pointer-events-none z-20">
-                <!-- Kontrol Sentuh P1 (Kiri) -->
-                <div class="flex items-end justify-between px-2 pointer-events-auto">
-                    <div class="flex gap-2">
-                        <button data-player="0" data-action="left" class="touch-btn w-12 h-12 sm:w-14 sm:h-14">
-                            <span class="text-base leading-none">◀</span>
-                            <span class="text-[8px] font-bold">KIRI</span>
-                        </button>
-                        <button data-player="0" data-action="right" class="touch-btn w-12 h-12 sm:w-14 sm:h-14">
-                            <span class="text-base leading-none">▶</span>
-                            <span class="text-[8px] font-bold">KANAN</span>
-                        </button>
+            <div id="touch-multi" class="hidden w-full grid grid-cols-2 gap-4 px-1 pb-2 pointer-events-none z-20">
+                <div class="flex items-end justify-between px-1 sm:px-3">
+                    <div class="rocker pointer-events-auto w-28 h-12 sm:w-36 sm:h-14" data-player="0" aria-label="Kiri / Kanan P1">
+                        <div class="rocker-btn" data-dir="left">◀</div>
+                        <div class="rocker-btn" data-dir="right">▶</div>
                     </div>
-                    <div class="flex items-center mr-2 sm:mr-4">
-                        <button data-player="0" data-action="jump" class="touch-btn btn-a w-14 h-14 sm:w-16 sm:h-16">
-                            <span class="text-base leading-none">▲</span>
-                            <span class="text-[8px] font-bold">LOMPAT</span>
-                        </button>
+                    <div class="flex items-end gap-1.5 pointer-events-auto">
+                        <button data-player="0" data-action="run" class="touch-btn btn-b w-11 h-11 sm:w-12 sm:h-12" aria-label="Lari P1"><span class="font-pixel text-[10px]">B</span></button>
+                        <button data-player="0" data-action="jump" class="touch-btn btn-a w-14 h-14 sm:w-16 sm:h-16 mb-3" aria-label="Lompat P1"><span class="font-pixel text-sm">A</span></button>
                     </div>
                 </div>
-                <!-- Kontrol Sentuh P2 (Kanan) -->
-                <div class="flex items-end justify-between px-2 pointer-events-auto">
-                    <div class="flex gap-2">
-                        <button data-player="1" data-action="left" class="touch-btn w-12 h-12 sm:w-14 sm:h-14">
-                            <span class="text-base leading-none">◀</span>
-                            <span class="text-[8px] font-bold">KIRI</span>
-                        </button>
-                        <button data-player="1" data-action="right" class="touch-btn w-12 h-12 sm:w-14 sm:h-14">
-                            <span class="text-base leading-none">▶</span>
-                            <span class="text-[8px] font-bold">KANAN</span>
-                        </button>
+                <div class="flex items-end justify-between px-1 sm:px-3">
+                    <div class="rocker pointer-events-auto w-28 h-12 sm:w-36 sm:h-14" data-player="1" aria-label="Kiri / Kanan P2">
+                        <div class="rocker-btn" data-dir="left">◀</div>
+                        <div class="rocker-btn" data-dir="right">▶</div>
                     </div>
-                    <div class="flex items-center mr-2 sm:mr-4">
-                        <button data-player="1" data-action="jump" class="touch-btn btn-a w-14 h-14 sm:w-16 sm:h-16">
-                            <span class="text-base leading-none">▲</span>
-                            <span class="text-[8px] font-bold">LOMPAT</span>
-                        </button>
+                    <div class="flex items-end gap-1.5 pointer-events-auto">
+                        <button data-player="1" data-action="run" class="touch-btn btn-b w-11 h-11 sm:w-12 sm:h-12" aria-label="Lari P2"><span class="font-pixel text-[10px]">B</span></button>
+                        <button data-player="1" data-action="jump" class="touch-btn btn-a btn-luigi w-14 h-14 sm:w-16 sm:h-16 mb-3" aria-label="Lompat P2"><span class="font-pixel text-sm">A</span></button>
                     </div>
                 </div>
             </div>
@@ -2377,7 +2366,8 @@ function startGameFromSetup(e) {
         document.getElementById('mp-p1-label').textContent = `P1: ${p1Name}`;
         document.getElementById('mp-p2-label').textContent = `P2: ${p2Name}`;
         const q1Overlay = document.getElementById('quiz-overlay-p1');
-        q1Overlay.className = 'hidden fixed top-20 bottom-2 left-0 w-1/2 flex items-center justify-center p-2 pointer-events-auto z-30';
+        document.getElementById('q2-title').textContent = 'P2: ' + p2Name;
+        q1Overlay.className = 'hidden fixed top-16 bottom-1 left-0 w-1/2 flex items-center justify-center p-1.5 pointer-events-auto z-30';
     }
 
     updateTouchVisibility();
@@ -2530,8 +2520,9 @@ function showVictoryModal() {
             winnerText = w1.finishTime < w2.finishTime ? `🏆 PEMENANG: ${w1.name} (PEMAIN 1)!` : `🏆 PEMENANG: ${w2.name} (PEMAIN 2)!`;
         }
         document.getElementById('mp-winner-banner').textContent = winnerText;
-        document.getElementById('tbl-p1-head').textContent = w1.name;
-        document.getElementById('tbl-p2-head').textContent = w2.name;
+        const p1Wins = winnerText.includes('PEMAIN 1');
+        document.getElementById('tbl-p1-head').textContent = (p1Wins ? '👑 ' : '🥈 ') + w1.name;
+        document.getElementById('tbl-p2-head').textContent = (p1Wins ? '🥈 ' : '👑 ') + w2.name;
 
         document.getElementById('mp-result-tbody').innerHTML = `
             <tr><td class="p-2 border border-black text-left">Soal Benar</td><td class="p-2 border border-black">${w1.correctCount}/10</td><td class="p-2 border border-black">${w2.correctCount}/10</td></tr>
@@ -3000,6 +2991,19 @@ function gameLoop(timestamp) {
             ctx.fillRect(halfW - 3, 0, 6, H);
             ctx.fillStyle = '#fbd000';
             ctx.fillRect(halfW - 1, 0, 2, H);
+            worlds.forEach((w, i) => {
+                if (w.inQuiz || w.finished) {
+                    const cx = i === 0 ? halfW / 2 : halfW + (W - halfW) / 2;
+                    ctx.font = 'bold 12px "Press Start 2P", monospace';
+                    ctx.textAlign = 'center';
+                    const t = w.finished ? '🏁 FINISH!' : '📝 MENJAWAB KUIS...';
+                    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+                    ctx.fillRect(cx - 120, 70, 240, 26);
+                    ctx.fillStyle = w.finished ? '#4ade80' : '#fde047';
+                    ctx.fillText(t, cx, 88);
+                    ctx.textAlign = 'left';
+                }
+            });
         }
 
         updateHUD();
