@@ -1312,86 +1312,41 @@ function saveGeneratedAiQuestionsToBank() {
     }
 }
 
-/* -------------------- 3. PIXEL ART RENDERER -------------------- */
+/* -------------------- 3. PIXEL ART RENDERER (gaya NES klasik) -------------------- */
+const SPR = {
+  stand: ["...RRRRR....","..RRRRRRRRR.","..HHHSSKS...",".HSHSSSKSSS.",".HSHHSSSKSSS",".HHSSSSKKKK.","...SSSSSSS..","..RRORRR....",".RRRORRORRR.","RRRROOOORRRR","WWROYOOYORWW","WWWOOOOOOWWW","WWOOOOOOOOWW","..OOO..OOO..",".HHH....HHH.","HHHH....HHHH"],
+  walk: ["...RRRRR....","..RRRRRRRRR.","..HHHSSKS...",".HSHSSSKSSS.",".HSHHSSSKSSS",".HHSSSSKKKK.","...SSSSSSS..","..RRRRORR...",".RRRRROORWW.","WRRRROYOOWW.","WWROOOOOOO..","..OOOOOOOO..","..OOOOOOOH..","...OOO.HHH..","...HHH.HHH..","...HHHH....."],
+  jump: ["..........WW","...RRRRR..WW","..RRRRRRRRRW","..HHHSSKS.RR",".HSHSSSKSSRR",".HSHHSSSKSSR",".HHSSSSKKKK.","...SSSSSSS..","WWRRORRRORR.","WWRRRORRRORR","..RROOYOOYOO","...OOOOOOOOO","..OOOOOOOOO.",".OOOO..OOO..","HHHH........","HHHH........"]
+};
+const ENEMY_SPR = ["......BBBB......","....BBBBBBBB....","...BBBBBBBBBB...","..BKKBBBBBBKKB..",".BBBWKKBBKKWBBB.",".BBBWKWBBWKWBBB.","BBBBWWWBBWWWBBBB","BBBBBBBBBBBBBBBB","BBBBBBBBBBBBBBBB",".BBBBTTTTTTBBBB.","....TTTTTTTT....","....TTTTTTTT....","..KKKTTTTTT.....",".KKKKKTTTT.KK...",".KKKKKK..KKKKK..","..KKKKK..KKKKKK."];
+function drawSprite(ctx, rows, x, y, w, h, pal) {
+  const pw = w / rows[0].length, ph = h / rows.length;
+  for (let r = 0; r < rows.length; r++) {
+    const row = rows[r];
+    for (let c = 0; c < row.length; c++) {
+      const col = pal[row[c]];
+      if (!col) continue;
+      ctx.fillStyle = col;
+      ctx.fillRect(Math.floor(x + c * pw), Math.floor(y + r * ph), Math.ceil(pw), Math.ceil(ph));
+    }
+  }
+}
 function drawPixelCharacter(ctx, x, y, w, h, state, facing, animTimer, hatColor = '#e52521', shirtColor = '#e52521') {
     ctx.save();
     ctx.translate(Math.round(x + w / 2), Math.round(y + h / 2));
     if (facing < 0) ctx.scale(-1, 1);
-
-    const hw = w / 2;
-    const hh = h / 2;
-    let bounceY = 0;
-    let legOffset = 0;
-    let stretchX = 1;
-    let stretchY = 1;
-
-    if (state === 'idle') {
-        bounceY = Math.sin(animTimer * 4) * 1.5;
-    } else if (state === 'walk' || state === 'run') {
-        const speed = state === 'run' ? 18 : 11;
-        bounceY = Math.abs(Math.sin(animTimer * speed)) * -3;
-        legOffset = Math.sin(animTimer * speed) * 6;
-    } else if (state === 'jump') {
-        stretchX = 0.92;
-        stretchY = 1.08;
-    } else if (state === 'fall') {
-        stretchX = 0.95;
-        stretchY = 1.05;
-    } else if (state === 'land') {
-        stretchX = 1.15;
-        stretchY = 0.85;
-        bounceY = 3;
+    let rows = SPR.stand;
+    if (state === 'jump' || state === 'fall') rows = SPR.jump;
+    else if (state === 'walk' || state === 'run') {
+        const f = Math.floor(animTimer * (state === 'run' ? 16 : 10)) % 3;
+        rows = f === 1 ? SPR.walk : (f === 2 ? SPR.stand : SPR.walk);
+        
     }
-
-    ctx.scale(stretchX, stretchY);
-    ctx.translate(0, bounceY);
-
-    // Sepatu cokelat (Kiri & Kanan animasi langkah)
-    ctx.fillStyle = '#6b3e11';
-    ctx.fillRect(-hw + 3 - legOffset, hh - 8, 12, 8);
-    ctx.fillRect(1 + legOffset, hh - 8, 12, 8);
-
-    // Celana biru (Overall)
-    ctx.fillStyle = '#1d4ed8';
-    ctx.fillRect(-hw + 5, 2, w - 10, hh - 10);
-    // Tali overall
-    ctx.fillRect(-hw + 7, -4, 4, 7);
-    ctx.fillRect(hw - 11, -4, 4, 7);
-    // Kancing kuning
-    ctx.fillStyle = '#fbd000';
-    ctx.fillRect(-hw + 8, 3, 2.5, 2.5);
-    ctx.fillRect(hw - 10.5, 3, 2.5, 2.5);
-
-    // Baju (Merah untuk P1, Hijau untuk P2)
-    ctx.fillStyle = shirtColor;
-    ctx.fillRect(-hw + 3, -5, w - 6, 9);
-    // Tangan / Sarung tangan putih
-    ctx.fillStyle = '#ffffff';
-    const armSwing = (state === 'walk' || state === 'run') ? -legOffset * 0.8 : (state === 'jump' ? -8 : 0);
-    ctx.fillRect(hw - 4, -3 + armSwing * 0.4, 6, 6);
-    ctx.fillRect(-hw - 2, -3 - armSwing * 0.4, 6, 6);
-
-    // Kepala & Wajah ramah
-    ctx.fillStyle = '#ffcc99';
-    ctx.fillRect(-hw + 5, -hh + 7, w - 10, 14);
-    // Hidung
-    ctx.fillRect(hw - 5, -hh + 12, 5, 4);
-    // Mata ramah
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(3, -hh + 9, 3, 4);
-    // Senyum & Kumis ramah
-    ctx.fillStyle = '#4a2511';
-    ctx.fillRect(2, -hh + 16, 8, 2.5);
-
-    // Topi petualang
-    ctx.fillStyle = hatColor;
-    ctx.fillRect(-hw + 4, -hh + 1, w - 8, 7);
-    // Visor topi ke depan
-    ctx.fillRect(-hw + 5, -hh + 5, w - 4, 3);
-    // Emblem putih pada topi
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(1, -hh + 2, 5, 4);
-
+    let sy = 1;
+    if (state === 'land') sy = 0.9;
+    ctx.scale(1, sy);
+    const pal = { R: hatColor, O: '#2038ec', S: '#fca044', H: '#7a3c0c', K: '#000000', W: '#ffffff', Y: '#fcd800' };
+    drawSprite(ctx, rows, -w / 2, -h / 2 + (h - h * sy), w, h, pal);
     ctx.restore();
 }
 
@@ -1915,157 +1870,135 @@ class PlayerWorld {
         ctx.translate(viewX, viewY);
         ctx.scale(scale, scale);
 
-        // 1. Langit Biru Cerah
-        const skyGrad = ctx.createLinearGradient(0, 0, 0, this.baseHeight);
-        skyGrad.addColorStop(0, '#4a88f7');
-        skyGrad.addColorStop(1, '#8ec5fc');
-        ctx.fillStyle = skyGrad;
+        // 1. Langit biru klasik NES
+        ctx.fillStyle = '#5c94fc';
         ctx.fillRect(0, 0, virtualW, this.baseHeight);
 
-        // 2. Matahari
-        ctx.fillStyle = '#fde047';
-        ctx.beginPath();
-        ctx.arc(virtualW - 85, 75, 34, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = 'rgba(253, 224, 71, 0.3)';
-        ctx.beginPath();
-        ctx.arc(virtualW - 85, 75, 46, 0, Math.PI * 2);
-        ctx.fill();
-
-        // 3. Awan Bergerak (Parallax)
+        // 3. Awan Bergerak (Parallax) - awan putih bergaris hitam
         this.clouds.forEach(c => {
             const cx = c.x - this.cameraX * 0.35;
             if (cx < -120 || cx > virtualW + 120) return;
-            ctx.fillStyle = 'rgba(255,255,255,0.92)';
             ctx.beginPath();
             ctx.arc(cx, c.y, 20 * c.scale, 0, Math.PI * 2);
-            ctx.arc(cx + 22 * c.scale, c.y - 6 * c.scale, 24 * c.scale, 0, Math.PI * 2);
+            ctx.arc(cx + 22 * c.scale, c.y - 10 * c.scale, 24 * c.scale, 0, Math.PI * 2);
             ctx.arc(cx + 44 * c.scale, c.y, 18 * c.scale, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.lineWidth = 3; ctx.strokeStyle = '#000'; ctx.stroke();
+            ctx.fillStyle = '#ffffff'; ctx.fill();
+            ctx.fillStyle = '#3cbcfc';
+            ctx.fillRect(cx - 14 * c.scale, c.y + 8 * c.scale, 72 * c.scale, 4);
         });
 
-        // 4. Pegunungan & Bukit Hijau (Parallax)
+        // 4. Bukit hijau klasik (dengan bintik)
         for (let i = 0; i < 24; i++) {
             const mx = i * 420 - this.cameraX * 0.5;
             if (mx < -260 || mx > virtualW + 260) continue;
-            // Gunung biru keunguan
-            ctx.fillStyle = '#6495ed';
+            const big = i % 2 === 0;
+            const hw = big ? 120 : 75, hh = big ? 95 : 55;
             ctx.beginPath();
             ctx.moveTo(mx, this.groundY);
-            ctx.lineTo(mx + 110, this.groundY - 175);
-            ctx.lineTo(mx + 220, this.groundY);
-            ctx.fill();
-            // Puncak salju
-            ctx.fillStyle = '#ffffff';
-            ctx.beginPath();
-            ctx.moveTo(mx + 82, this.groundY - 130);
-            ctx.lineTo(mx + 110, this.groundY - 175);
-            ctx.lineTo(mx + 138, this.groundY - 130);
-            ctx.fill();
-
-            // Bukit hijau
-            ctx.fillStyle = '#22c55e';
-            ctx.beginPath();
-            ctx.arc(mx + 280, this.groundY, 75, Math.PI, 0);
-            ctx.fill();
+            ctx.quadraticCurveTo(mx + hw, this.groundY - hh * 2, mx + hw * 2, this.groundY);
+            ctx.closePath();
+            ctx.fillStyle = '#00a800'; ctx.fill();
+            ctx.lineWidth = 3; ctx.strokeStyle = '#000'; ctx.stroke();
+            ctx.fillStyle = '#005800';
+            ctx.fillRect(mx + hw - 14, this.groundY - hh + 12, 6, 14);
+            ctx.fillRect(mx + hw + 8, this.groundY - hh + 12, 6, 14);
+            if (big) ctx.fillRect(mx + hw - 3, this.groundY - hh + 40, 6, 14);
         }
 
         // Transformasi Kamera Dunia
         ctx.save();
         ctx.translate(-Math.round(this.cameraX), 0);
 
-        // 5. Pohon Pixel Art
+        // 5. Semak hijau (pengganti pohon, seperti aslinya)
         this.trees.forEach(t => {
             if (t.x < this.cameraX - 80 || t.x > this.cameraX + virtualW + 80) return;
             const s = t.size;
-            ctx.fillStyle = '#78350f';
-            ctx.fillRect(t.x - 8 * s, t.y - 48 * s, 16 * s, 48 * s);
-            ctx.fillStyle = '#15803d';
             ctx.beginPath();
-            ctx.arc(t.x, t.y - 56 * s, 26 * s, 0, Math.PI * 2);
-            ctx.arc(t.x - 16 * s, t.y - 44 * s, 18 * s, 0, Math.PI * 2);
-            ctx.arc(t.x + 16 * s, t.y - 44 * s, 18 * s, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.arc(t.x - 22 * s, t.y - 12 * s, 16 * s, Math.PI, 0);
+            ctx.arc(t.x, t.y - 18 * s, 20 * s, Math.PI, 0);
+            ctx.arc(t.x + 22 * s, t.y - 12 * s, 16 * s, Math.PI, 0);
+            ctx.lineTo(t.x + 38 * s, t.y); ctx.lineTo(t.x - 38 * s, t.y); ctx.closePath();
+            ctx.fillStyle = '#80d010'; ctx.fill();
+            ctx.lineWidth = 3; ctx.strokeStyle = '#000'; ctx.stroke();
         });
 
-        // 6. Tanah Berumput
+        // 6. Tanah balok klasik
         this.grounds.forEach(g => {
             if (g.x + g.w < this.cameraX || g.x > this.cameraX + virtualW) return;
-            // Tanah cokelat
-            ctx.fillStyle = '#b45309';
+            ctx.fillStyle = '#c84c0c';
             ctx.fillRect(g.x, g.y, g.w, g.h);
-            // Pola batu bata tanah
-            ctx.fillStyle = '#92400e';
-            for (let bx = g.x + 8; bx < g.x + g.w - 16; bx += 32) {
-                ctx.fillRect(bx, g.y + 24, 18, 12);
-                ctx.fillRect(bx + 10, g.y + 46, 18, 12);
+            const T = 36;
+            for (let ty = g.y; ty < g.y + g.h; ty += T) {
+                for (let tx = g.x; tx < g.x + g.w; tx += T) {
+                    const tw = Math.min(T, g.x + g.w - tx);
+                    ctx.fillStyle = '#fcbcb0';
+                    ctx.fillRect(tx, ty, tw, 3);
+                    ctx.fillRect(tx, ty, 3, T);
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(tx, ty + T - 3, tw, 3);
+                    if (tw > 20) {
+                        ctx.fillRect(tx + T - 3, ty, 3, T);
+                        ctx.fillRect(tx + 20, ty + 3, 3, 14);
+                        ctx.fillRect(tx + 20, ty + 17, 13, 3);
+                        ctx.fillStyle = '#fcbcb0';
+                        ctx.fillRect(tx + 23, ty + 20, 3, 13);
+                    }
+                }
             }
-            // Rumput hijau atas
-            ctx.fillStyle = '#16a34a';
-            ctx.fillRect(g.x, g.y, g.w, 16);
-            ctx.fillStyle = '#4ade80';
-            ctx.fillRect(g.x, g.y, g.w, 5);
         });
 
-        // 7. Pipa Hijau
+        // 7. Pipa Hijau klasik (silinder bergaris)
+        const pipeBands = (x, y, w, h) => {
+            ctx.fillStyle = '#00a800'; ctx.fillRect(x, y, w, h);
+            ctx.fillStyle = '#b8f818'; ctx.fillRect(x + w * 0.12, y, w * 0.1, h); ctx.fillRect(x + w * 0.3, y, w * 0.25, h);
+            ctx.fillStyle = '#005800'; ctx.fillRect(x + w * 0.72, y, w * 0.08, h); ctx.fillRect(x + w * 0.86, y, w * 0.06, h);
+            ctx.lineWidth = 3; ctx.strokeStyle = '#000'; ctx.strokeRect(x, y, w, h);
+        };
         this.pipes.forEach(pipe => {
             if (pipe.x + pipe.w < this.cameraX || pipe.x > this.cameraX + virtualW) return;
-            // Badan pipa
-            ctx.fillStyle = '#00a800';
-            ctx.fillRect(pipe.x + 4, pipe.y + 18, pipe.w - 8, pipe.h - 18);
-            ctx.fillStyle = '#4ade80';
-            ctx.fillRect(pipe.x + 10, pipe.y + 18, 8, pipe.h - 18);
-            // Kepala pipa
-            ctx.fillStyle = '#00a800';
-            ctx.fillRect(pipe.x, pipe.y, pipe.w, 18);
-            ctx.fillStyle = '#4ade80';
-            ctx.fillRect(pipe.x + 6, pipe.y + 2, 10, 14);
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 2.5;
-            ctx.strokeRect(pipe.x, pipe.y, pipe.w, 18);
-            ctx.strokeRect(pipe.x + 4, pipe.y + 18, pipe.w - 8, pipe.h - 18);
+            pipeBands(pipe.x + 4, pipe.y + 20, pipe.w - 8, pipe.h - 20);
+            pipeBands(pipe.x - 2, pipe.y, pipe.w + 4, 20);
         });
 
-        // 8. Balok Batu Bata, Balok Tanda Tanya (?), & Platform Melayang
+        // 8. Balok Bata, Balok ?, & Platform
+        const tNow = performance.now() / 1000;
+        const qFlash = ['#fca044', '#fca044', '#c84c0c', '#7a3c0c'][Math.floor(tNow * 4) % 4];
+        const rivets = (x, y, w, h) => {
+            ctx.fillStyle = '#000';
+            [[4,4],[w-8,4],[4,h-8],[w-8,h-8]].forEach(([a,b]) => ctx.fillRect(x + a, y + b, 4, 4));
+        };
+        const Q = ["..XXXX..",".XX..XX.",".XX..XX.","....XXX.","...XX...","...XX...","........","...XX..."];
         this.blocks.forEach(b => {
             if (b.x + b.w < this.cameraX || b.x > this.cameraX + virtualW) return;
             const by = b.y + b.bumpY;
-            if (b.type === 'brick') {
-                ctx.fillStyle = '#c84c0c';
-                ctx.fillRect(b.x, by, b.w, b.h);
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(b.x, by, b.w, b.h);
-                ctx.beginPath();
-                ctx.moveTo(b.x, by + 18); ctx.lineTo(b.x + b.w, by + 18);
-                ctx.moveTo(b.x + 18, by); ctx.lineTo(b.x + 18, by + 18);
-                ctx.stroke();
+            if (b.type === 'brick' || b.type === 'platform') {
+                const bh = b.type === 'platform' ? 18 : b.h;
+                ctx.fillStyle = '#c84c0c'; ctx.fillRect(b.x, by, b.w, bh);
+                ctx.fillStyle = '#fcbcb0'; ctx.fillRect(b.x, by, b.w, 3);
+                ctx.fillStyle = '#000';
+                const rh = b.type === 'platform' ? 9 : 9;
+                for (let r = 0; r * rh < bh; r++) {
+                    const yy = by + r * rh;
+                    ctx.fillRect(b.x, yy + rh - 2, b.w, 2);
+                    const off = r % 2 === 0 ? 0 : 9;
+                    for (let xx = off; xx < b.w; xx += 18) ctx.fillRect(b.x + xx, yy, 2, rh);
+                }
+                ctx.lineWidth = 2; ctx.strokeStyle = '#000'; ctx.strokeRect(b.x, by, b.w, bh);
             } else if (b.type === 'question') {
-                ctx.fillStyle = '#fbd000';
-                ctx.fillRect(b.x, by, b.w, b.h);
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 2.5;
-                ctx.strokeRect(b.x, by, b.w, b.h);
-                ctx.fillStyle = '#92400e';
-                ctx.font = 'bold 20px "Press Start 2P", monospace';
-                ctx.fillText('?', b.x + 9, by + 27);
+                ctx.fillStyle = '#000'; ctx.fillRect(b.x, by, b.w, b.h);
+                ctx.fillStyle = qFlash; ctx.fillRect(b.x + 2, by + 2, b.w - 4, b.h - 4);
+                ctx.fillStyle = '#fcbcb0'; ctx.fillRect(b.x + 2, by + 2, b.w - 4, 2);
+                rivets(b.x, by, b.w, b.h);
+                drawSprite(ctx, Q, b.x + 6, by + 6, 24, 24, { X: '#c84c0c' });
+                drawSprite(ctx, Q, b.x + 8, by + 8, 24, 24, { X: '#000' });
+                drawSprite(ctx, Q, b.x + 6, by + 6, 24, 24, { X: '#c84c0c' });
             } else if (b.type === 'used') {
-                ctx.fillStyle = '#94a3b8';
-                ctx.fillRect(b.x, by, b.w, b.h);
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(b.x, by, b.w, b.h);
-            } else if (b.type === 'platform') {
-                ctx.fillStyle = '#d97706';
-                ctx.fillRect(b.x, by, b.w, 18);
-                ctx.fillStyle = '#22c55e';
-                ctx.fillRect(b.x, by, b.w, 6);
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(b.x, by, b.w, 18);
+                ctx.fillStyle = '#000'; ctx.fillRect(b.x, by, b.w, b.h);
+                ctx.fillStyle = '#c84c0c'; ctx.fillRect(b.x + 2, by + 2, b.w - 4, b.h - 4);
+                rivets(b.x, by, b.w, b.h);
             }
         });
-
         // 9. Koin Emas Berputar
         this.coinItems.forEach(c => {
             if (c.collected || c.x + c.w < this.cameraX || c.x > this.cameraX + virtualW) return;
@@ -2134,27 +2067,20 @@ class PlayerWorld {
             ctx.fillText('FINISH', ff.x + 27, ff.y + 36);
         }
 
-        // 12. Musuh Berjalan
+        // 12. Musuh Goomba klasik
         this.enemies.forEach(e => {
             if (!e.alive && e.squashTimer <= 0) return;
             if (e.x + e.w < this.cameraX || e.x > this.cameraX + virtualW) return;
-            const eh = e.alive ? e.h : 10;
-            const ey = e.alive ? e.y : e.y + e.h - 10;
-            // Badan jamur musuh
-            ctx.fillStyle = '#9a3412';
-            ctx.beginPath();
-            ctx.arc(e.x + e.w / 2, ey + eh * 0.55, e.w / 2, Math.PI, 0);
-            ctx.fill();
-            ctx.fillStyle = '#fed7aa';
-            ctx.fillRect(e.x + 6, ey + eh * 0.55, e.w - 12, eh * 0.45);
-            // Mata garang
+            const pal = { B: '#c84c0c', K: '#000', W: '#fcbcb0', T: '#fcbcb0' };
             if (e.alive) {
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(e.x + 8, ey + 10, 6, 7);
-                ctx.fillRect(e.x + 20, ey + 10, 6, 7);
-                ctx.fillStyle = '#000';
-                ctx.fillRect(e.x + 10, ey + 12, 3, 4);
-                ctx.fillRect(e.x + 21, ey + 12, 3, 4);
+                const flip = Math.floor(performance.now() / 180) % 2 === 0;
+                ctx.save();
+                ctx.translate(e.x + e.w / 2, 0);
+                if (flip) ctx.scale(-1, 1);
+                drawSprite(ctx, ENEMY_SPR, -e.w / 2, e.y, e.w, e.h, pal);
+                ctx.restore();
+            } else {
+                drawSprite(ctx, ENEMY_SPR.slice(0, 9), e.x, e.y + e.h - 12, e.w, 12, pal);
             }
         });
 
