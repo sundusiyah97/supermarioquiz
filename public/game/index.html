@@ -614,7 +614,7 @@
         <!-- 8. OVERLAY GAMEPLAY (HUD, QUIZ PANEL, TOUCH CONTROLS) -->
         <div id="gameplay-ui" class="hidden fixed inset-0 z-20 pointer-events-none flex flex-col justify-between">
             <!-- HUD SINGLE PLAYER -->
-            <div id="hud-single" class="w-full px-3 py-2 flex flex-wrap items-center justify-between gap-2 bg-gradient-to-b from-black/75 to-transparent text-white">
+            <div id="hud-single" class="w-full pl-3 pr-[118px] py-2 flex flex-wrap items-center justify-between gap-2 bg-gradient-to-b from-black/75 to-transparent text-white">
                 <div class="flex flex-wrap items-center gap-3 sm:gap-5 font-pixel text-[9px] sm:text-xs">
                     <div><span class="text-slate-300 block text-[8px]">SCORE</span><span id="hud1-score" class="text-yellow-300">000000</span></div>
                     <div><span class="text-slate-300 block text-[8px]">COINS</span><span id="hud1-coins" class="text-amber-300">🪙 00</span></div>
@@ -629,7 +629,7 @@
                             <div id="hud1-progress" class="h-full bg-green-400 transition-all duration-300" style="width: 0%"></div>
                         </div>
                     </div>
-                    <button onclick="quickToggleTouch()" id="btn-touch-hud" class="bg-black/75 hover:bg-black text-green-300 border-2 border-white/60 px-2.5 py-1.5 rounded-lg font-pixel text-[9px]" title="Tampilkan/Sembunyikan Tombol">🎮 TOMBOL: ON</button>
+                    <button onclick="quickToggleTouch()" id="btn-touch-hud" class="bg-black/75 hover:bg-black text-green-300 border-2 border-white/60 px-2.5 py-1.5 rounded-lg font-pixel text-[9px] whitespace-nowrap" title="Tampilkan/Sembunyikan Tombol">🎮 ON</button>
                     <button onclick="toggleSound()" id="btn-sound-hud" class="bg-black/70 border-2 border-white/50 p-2 rounded-lg text-xs">🔊</button>
                     <button onclick="togglePause()" class="btn-retro bg-yellow-400 text-black font-pixel text-[10px] px-3 py-2 rounded-lg">❚❚</button>
                 </div>
@@ -654,7 +654,7 @@
                     </div>
                 </div>
                 <!-- HUD Pemain 2 -->
-                <div class="px-2 py-1.5 flex flex-col gap-1 pr-10">
+                <div class="px-2 py-1.5 flex flex-col gap-1 pr-[118px]">
                     <div class="flex justify-between items-center font-pixel text-[8px] sm:text-[10px]">
                         <span id="mp-p2-label" class="text-emerald-400 truncate max-w-[90px]">P2: LUIGI</span>
                         <span id="mp-p2-lives">❤️❤️❤️</span>
@@ -2276,7 +2276,7 @@ function updateTouchVisibility() {
         if (tMulti) tMulti.classList.toggle('hidden', !shouldShow);
     }
     if (hudBtn) {
-        hudBtn.textContent = shouldShow ? '🎮 TOMBOL: ON' : '🎮 TOMBOL: OFF';
+        hudBtn.textContent = shouldShow ? '🎮 ON' : '🎮 OFF';
     }
 }
 
@@ -3025,14 +3025,14 @@ window.addEventListener('load', () => {
     requestAnimationFrame(gameLoop);
 });
 </script>
-    <button id="btn-pid" onclick="togglePid()" title="Mode PID: tombol di tengah" class="btn-retro fixed top-2 right-14 z-[60] bg-white text-black font-pixel text-[9px] px-2 py-2 rounded-lg" style="border-width:3px;box-shadow:0 4px 0 #000">📱 HP</button>
+    <div id="top-tools" class="fixed top-2 right-2 z-[60] flex items-center gap-1.5"><button id="btn-pid" onclick="togglePid()" title="Mode PID: tombol di tengah" class="btn-retro whitespace-nowrap bg-white text-black font-pixel text-[9px] px-2 py-2 rounded-lg" style="border-width:3px;box-shadow:0 4px 0 #000">📱 HP</button><button id="btn-fullscreen" onclick="toggleFullscreen()" title="Layar Penuh" class="btn-retro bg-yellow-400 text-black font-pixel text-[10px] px-2.5 py-2 rounded-lg" style="border-width:3px;box-shadow:0 4px 0 #000">⛶</button></div>
     <script>
     function syncPid(){ const on=document.body.classList.contains('pid-mode'); document.getElementById('btn-pid').textContent=on?'🖥️ PID':'📱 HP'; }
     function togglePid(){ const on=document.body.classList.toggle('pid-mode'); try{localStorage.setItem('pidMode',on?'1':'0')}catch(e){} syncPid(); }
     try{ if(localStorage.getItem('pidMode')==='1') document.body.classList.add('pid-mode'); }catch(e){}
     syncPid();
     </script>
-    <button id="btn-fullscreen" onclick="toggleFullscreen()" title="Layar Penuh" class="btn-retro fixed top-2 right-2 z-[60] bg-yellow-400 text-black font-pixel text-[10px] px-2.5 py-2 rounded-lg" style="border-width:3px;box-shadow:0 4px 0 #000">⛶</button>
+    
     <script>
     function openFullTab(){ window.open(location.href,'_blank'); }
     function getTopDoc(){ try{ if(window.top!==window && window.top.document) return window.top.document; }catch(e){} return null; }
