@@ -564,14 +564,8 @@
 
                         <!-- Topik / Materi -->
                         <div class="space-y-1.5">
-                            <div class="flex flex-wrap items-center justify-between gap-2">
-                                <label class="font-bold text-xs">Topik / Materi Pembelajaran:</label>
-                                <button type="button" onclick="suggestAiTopics()" id="btn-suggest-topics" class="bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg border border-black shadow-sm">
-                                    💡 Usulkan Materi Otomatis via AI
-                                </button>
-                            </div>
+                            <label class="font-bold text-xs">Topik / Materi Pembelajaran:</label>
                             <input type="text" id="ai-topics" placeholder="Contoh: Operasi hitung perkalian, pecahan sederhana, bangun datar..." class="w-full p-2 border-2 border-black rounded-lg bg-white text-xs">
-                            <div id="ai-topic-chips" class="hidden flex-wrap gap-1.5 pt-1"></div>
                         </div>
 
                         <!-- Instruksi Tambahan Guru -->
@@ -1107,53 +1101,6 @@ async function callGeminiJSON(prompt, systemInstruction, apiKey) {
             if (retries >= maxRetries) throw err;
             await new Promise(r => setTimeout(r, 1000 * Math.pow(2, retries)));
         }
-    }
-}
-
-async function suggestAiTopics() {
-    const apiKey = getGeminiApiKey();
-    if (!apiKey) {
-        showToast('⚠️ Masukkan dan simpan Gemini API Key terlebih dahulu!');
-        document.getElementById('ai-api-key-input').focus();
-        return;
-    }
-
-    const grade = document.getElementById('ai-grade').value;
-    const subject = document.getElementById('ai-subject').value;
-    const btn = document.getElementById('btn-suggest-topics');
-    btn.disabled = true;
-    btn.textContent = '⏳ Meminta usulan AI...';
-
-    try {
-        const prompt = `Usulkan 5 topik/materi pembelajaran Kurikulum Merdeka SD yang paling esensial untuk Kelas ${grade} mata pelajaran ${subject}.
-Kembalikan JSON dengan format persis:
-{ "topics": ["Topik 1", "Topik 2", "Topik 3", "Topik 4", "Topik 5"] }`;
-
-        const res = await callGeminiJSON(prompt, 'Anda adalah pakar Kurikulum Merdeka Sekolah Dasar Indonesia.', apiKey);
-        if (res && Array.isArray(res.topics)) {
-            const chipsContainer = document.getElementById('ai-topic-chips');
-            chipsContainer.innerHTML = '';
-            chipsContainer.classList.remove('hidden');
-            chipsContainer.classList.add('flex');
-
-            res.topics.forEach(topic => {
-                const chip = document.createElement('button');
-                chip.type = 'button';
-                chip.className = 'text-[11px] bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-semibold px-2.5 py-1 rounded-full border border-indigo-400';
-                chip.textContent = `+ ${topic}`;
-                chip.onclick = () => {
-                    const input = document.getElementById('ai-topics');
-                    input.value = input.value ? `${input.value}, ${topic}` : topic;
-                };
-                chipsContainer.appendChild(chip);
-            });
-            showToast('💡 Usulan materi dari AI siap dipilih!');
-        }
-    } catch (err) {
-        showToast('❌ Gagal meminta usulan materi: ' + err.message);
-    } finally {
-        btn.disabled = false;
-        btn.textContent = '💡 Usulkan Materi Otomatis via AI';
     }
 }
 
