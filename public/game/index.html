@@ -99,6 +99,10 @@
             transform: translateY(3px);
             box-shadow: 0 1px 0 rgba(0,0,0,0.45);
         }
+        body.pid-mode #touch-single { justify-content: center !important; gap: 5rem; }
+        body.pid-mode #touch-single .rocker { width: 13rem; height: 5.5rem; }
+        body.pid-mode #touch-single .btn-a { width: 7rem; height: 7rem; }
+        body.pid-mode #touch-single .btn-b { width: 5rem; height: 5rem; }
         .rocker { display: flex; border-radius: 9999px; overflow: hidden; padding: 0; }
         .rocker-btn {
             flex: 1; display: flex; align-items: center; justify-content: center;
@@ -3021,6 +3025,13 @@ window.addEventListener('load', () => {
     requestAnimationFrame(gameLoop);
 });
 </script>
+    <button id="btn-pid" onclick="togglePid()" title="Mode PID: tombol di tengah" class="btn-retro fixed top-2 right-14 z-[60] bg-white text-black font-pixel text-[9px] px-2 py-2 rounded-lg" style="border-width:3px;box-shadow:0 4px 0 #000">📱 HP</button>
+    <script>
+    function syncPid(){ const on=document.body.classList.contains('pid-mode'); document.getElementById('btn-pid').textContent=on?'🖥️ PID':'📱 HP'; }
+    function togglePid(){ const on=document.body.classList.toggle('pid-mode'); try{localStorage.setItem('pidMode',on?'1':'0')}catch(e){} syncPid(); }
+    try{ if(localStorage.getItem('pidMode')==='1') document.body.classList.add('pid-mode'); }catch(e){}
+    syncPid();
+    </script>
     <button id="btn-fullscreen" onclick="toggleFullscreen()" title="Layar Penuh" class="btn-retro fixed top-2 right-2 z-[60] bg-yellow-400 text-black font-pixel text-[10px] px-2.5 py-2 rounded-lg" style="border-width:3px;box-shadow:0 4px 0 #000">⛶</button>
     <script>
     function openFullTab(){ window.open(location.href,'_blank'); }
