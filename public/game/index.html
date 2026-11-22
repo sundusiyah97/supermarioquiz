@@ -861,9 +861,43 @@ class SoundEngine {
         this.playTone(987.77, 'square', 0.08, 0, 0.12);
         this.playTone(1318.51, 'square', 0.25, 0.08, 0.12);
     }
+    sweep(f1, f2, type, duration, delay = 0, vol = 0.3) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const t = this.ctx.currentTime + delay;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(f1, t);
+        osc.frequency.exponentialRampToValueAtTime(f2, t + duration);
+        gain.gain.setValueAtTime(vol, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.start(t); osc.stop(t + duration + 0.02);
+    }
     stomp() {
-        this.playTone(180, 'sawtooth', 0.1, 0, 0.15);
-        this.playTone(110, 'sawtooth', 0.15, 0.05, 0.15);
+        this.sweep(1200, 600, 'square', 0.04, 0, 0.3);
+        this.sweep(750, 120, 'square', 0.16, 0.03, 0.35);
+    }
+    bump() {
+        this.sweep(220, 90, 'triangle', 0.1, 0, 0.45);
+        this.playTone(160, 'square', 0.06, 0, 0.18);
+    }
+    fall() {
+        this.sweep(1000, 150, 'square', 0.7, 0, 0.22);
+        this.playTone(130, 'sawtooth', 0.25, 0.7, 0.18);
+    }
+    respawn() {
+        [392, 523.25, 659.25, 783.99].forEach((n, i) => this.playTone(n, 'triangle', 0.12, i * 0.09, 0.2));
+    }
+    pause() {
+        this.playTone(1318.51, 'square', 0.08, 0, 0.15);
+        this.playTone(987.77, 'square', 0.08, 0.09, 0.15);
+        this.playTone(1318.51, 'square', 0.12, 0.18, 0.15);
+    }
+    click() {
+        this.sweep(900, 1400, 'square', 0.05, 0, 0.12);
     }
     hurt() {
         this.playTone(300, 'sawtooth', 0.15, 0, 0.15);
@@ -891,6 +925,12 @@ class SoundEngine {
     }
 }
 const sfx = new SoundEngine();
+document.addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b || b.closest('#touch-single, #touch-multi')) return;
+    if (b.closest('#q1-options, #q2-options')) return;
+    sfx.click();
+}, true);
 
 /* Pemutar Musik Latar (mario.mp3) */
 const bgMusic = document.getElementById('bg-music');
@@ -1730,7 +1770,7 @@ class PlayerWorld {
                         this.spawnFloatingText(s.x + 8, s.y - 16, '+100', '#fbd000');
                     } else if (s.type === 'brick') {
                         s.bumpY = -6;
-                        sfx.stomp();
+                        sfx.bump();
                     }
                 }
             }
@@ -1841,13 +1881,14 @@ class PlayerWorld {
     }
 
     handlePlayerHurt(fellInPit) {
-        sfx.hurt();
+        if (fellInPit) sfx.fall(); else sfx.hurt();
         this.lives -= 1;
         this.spawnParticles(this.player.x + 17, this.player.y + 20, '#ef4444', 15);
 
         if (this.lives <= 0) {
             // Reset nyawa menjadi 3 dan kembalikan ke posisi aman terdekat agar tetap edukatif & bisa lanjut
             this.lives = 3;
+            setTimeout(() => sfx.respawn(), fellInPit ? 800 : 450);
             this.score = Math.max(0, this.score - 200);
             this.spawnFloatingText(this.player.safeX, this.player.safeY - 30, 'NYAWA PENUH LAGI!', '#60a5fa');
         } else {
@@ -2516,9 +2557,11 @@ function togglePause() {
     if (gameState === 'playing') {
         gameState = 'paused';
         pauseBgMusic();
+        sfx.pause();
         document.getElementById('modal-pause').classList.remove('hidden');
     } else if (gameState === 'paused') {
         gameState = 'playing';
+        sfx.pause();
         playBgMusic();
         document.getElementById('modal-pause').classList.add('hidden');
     }
